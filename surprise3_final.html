@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Surprise 3</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    min-height: 100vh;
+    background: #fdf6f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 24px 16px 80px;
+    font-family: 'DM Sans', sans-serif;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* SOFT BACKGROUND BLOBS */
+body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+        radial-gradient(ellipse at 10% 15%, rgba(255,182,193,0.35) 0%, transparent 45%),
+        radial-gradient(ellipse at 90% 85%, rgba(255,218,185,0.3) 0%, transparent 45%),
+        radial-gradient(ellipse at 50% 50%, rgba(255,240,245,0.4) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+/* CARD */
+.card {
+    width: 100%;
+    max-width: 480px;
+    background: rgba(255,255,255,0.72);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,182,193,0.3);
+    border-radius: 24px;
+    padding: clamp(28px, 6vw, 44px) clamp(24px, 5vw, 40px);
+    position: relative;
+    z-index: 2;
+    box-shadow:
+        0 8px 40px rgba(220,130,140,0.12),
+        0 2px 8px rgba(220,130,140,0.08),
+        inset 0 1px 0 rgba(255,255,255,0.9);
+}
+
+/* TOP LABEL */
+.card-label {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(192,104,122,0.6);
+    margin-bottom: 20px;
+    font-weight: 400;
+}
+
+/* LINES */
+#lineContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-height: 100px;
+}
+
+.line {
+    opacity: 0;
+    transform: translateY(12px);
+    animation: lineIn 0.55s cubic-bezier(.22,1,.36,1) forwards;
+    color: #5a3a3a;
+    font-size: clamp(15px, 3.5vw, 17px);
+    line-height: 1.7;
+    font-weight: 300;
+}
+
+.line.line-0 {
+    font-family: 'Lora', serif;
+    font-size: clamp(19px, 5vw, 23px);
+    font-weight: 600;
+    color: #c0687a;
+    text-align: center;
+    padding: 4px 0 12px;
+    border-bottom: 1px solid rgba(220,130,140,0.2);
+}
+
+@keyframes lineIn {
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* HINT */
+#hint {
+    margin-top: 24px;
+    font-size: 12px;
+    color: rgba(192,104,122,0.5);
+    text-align: center;
+    letter-spacing: 1.5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    animation: hintPulse 2s infinite ease-in-out;
+}
+@keyframes hintPulse {
+    0%,100% { opacity: 0.5; }
+    50%      { opacity: 1; }
+}
+
+.hint-dot {
+    width: 4px; height: 4px;
+    background: rgba(220,130,140,0.5);
+    border-radius: 50%;
+    animation: dotBounce 1.2s infinite ease-in-out;
+}
+.hint-dot:nth-child(2) { animation-delay: 0.2s; }
+.hint-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes dotBounce {
+    0%,80%,100% { transform: translateY(0); }
+    40%          { transform: translateY(-5px); }
+}
+
+/* BACK BUTTON */
+.back-btn {
+    position: fixed;
+    right: 20px; bottom: 24px;
+    background: linear-gradient(135deg, #e8899a, #f0b080);
+    padding: 11px 22px;
+    border-radius: 30px;
+    font-weight: 600;
+    color: white;
+    text-decoration: none;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    z-index: 100;
+    box-shadow: 0 4px 20px rgba(232,137,154,0.35);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    pointer-events: none;
+}
+.back-btn.show {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+.back-btn:hover {
+    box-shadow: 0 6px 28px rgba(232,137,154,0.5);
+    transform: translateY(-1px);
+}
+
+/* FLOATING PETALS */
+.petal {
+    position: fixed;
+    pointer-events: none;
+    animation: petalDrift linear infinite;
+    opacity: 0;
+    z-index: 1;
+    font-size: 14px;
+}
+@keyframes petalDrift {
+    0%   { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+    10%  { opacity: 0.7; }
+    90%  { opacity: 0.3; }
+    100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+    <div class="card-label">a little something for you</div>
+    <div id="lineContainer"></div>
+    <div id="hint">
+        <div class="hint-dot"></div>
+        <div class="hint-dot"></div>
+        <div class="hint-dot"></div>
+        <span style="font-size:12px; color:rgba(192,104,122,0.6); letter-spacing:1.5px;">tap to read</span>
+    </div>
+</div>
+
+<a href="../envelopes.html" id="backBtn" class="back-btn">BACK ◀</a>
+
+<script>
+const lines = [
+    "❤️ Adiye Vaisiyaa ❤️",
+    "I can't wait to make more memories as we grow closer with time",
+    "From this year on, I better see some effort… you texting and calling first 😌",
+    "Looking forward to more endless laughter and a lifetime of an unbreakable bond."
+];
+
+let currentLine = 0;
+let tapping = true;
+
+function showNextLine() {
+    if (!tapping) return;
+    if (currentLine < lines.length) {
+        const container = document.getElementById("lineContainer");
+        const div = document.createElement("div");
+        div.classList.add("line", "line-" + currentLine);
+        div.textContent = lines[currentLine];
+        div.style.animationDelay = "0s";
+        container.appendChild(div);
+        currentLine++;
+
+        if (currentLine === lines.length) {
+            tapping = false;
+            document.getElementById("hint").style.display = "none";
+            document.getElementById("backBtn").classList.add("show");
+        }
+    }
+}
+
+document.addEventListener("click", function(e) {
+    if (e.target.closest('.back-btn')) return;
+    showNextLine();
+});
+
+document.addEventListener("keydown", function(e) {
+    if (e.key === "Enter" || e.key === " ") showNextLine();
+});
+
+/* FLOATING PETALS */
+const petals = ['🌸','✿','❀','🌷'];
+function spawnPetal() {
+    const p = document.createElement("div");
+    p.className = "petal";
+    p.textContent = petals[Math.floor(Math.random() * petals.length)];
+    p.style.cssText = `
+        left:${Math.random()*100}vw;
+        animation-duration:${10+Math.random()*8}s;
+        animation-delay:${Math.random()*4}s;
+    `;
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 20000);
+}
+for (let k = 0; k < 10; k++) spawnPetal();
+setInterval(spawnPetal, 3000);
+
+window.onload = () => setTimeout(showNextLine, 400);
+</script>
+
+</body>
+</html>
